@@ -1,0 +1,39 @@
+server.port: 8080
+
+spring.application.name: gateway
+
+app.eureka-server: localhost
+
+ribbon.ServerListRefreshInterval: 5000
+ribbon.NFLoadBalancerPingInterval: 5
+
+spring.cloud.gateway.routes:
+
+- id: vendor
+  uri: lb://vendor
+  predicates:
+  - Path=/vendor/**
+
+- id: eureka-api
+  uri: http://${app.eureka-server}:8761
+  predicates:
+  - Path=/eureka/api/{segment}
+  filters:
+  - SetPath=/eureka/{segment}
+
+- id: eureka
+  uri: http://${app.eureka-server}:8761
+  predicates:
+  - Path=/eureka
+  filters:
+  - SetPath=/
+
+
+---
+
+spring.profiles: docker
+
+app.eureka-server: eureka
+
+eureka.client.serviceUrl.defaultZone: http://${app.eureka-server}:8761/eureka/
+
